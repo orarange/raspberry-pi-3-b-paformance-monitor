@@ -8,6 +8,7 @@ import (
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/load"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/net"
 )
@@ -87,11 +88,8 @@ func (sm *SystemMonitor) GetStats() *SystemStats {
 	}
 
 	// ロードアベレージを取得
-	if loadStat, err := host.Misc(); err == nil {
-		// Linuxの場合、LoadAvgが利用可能
-		if len(loadStat.Load1) > 0 {
-			stats.LoadAvg = loadStat.Load1[0]
-		}
+	if loadStat, err := load.Avg(); err == nil {
+		stats.LoadAvg = loadStat.Load1
 	}
 
 	// Goルーチン数を取得
