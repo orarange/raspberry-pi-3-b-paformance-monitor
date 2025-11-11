@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pi 3 B+ Performance Monitor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🍓 Raspberry Pi 3 B+ Performance Monitor</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span id="statusText">接続中...</span>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <!-- システム情報 -->
+            <div class="card system-info">
+                <h2>システム情報</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">稼働時間:</span>
+                        <span class="value" id="uptime">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Goルーチン:</span>
+                        <span class="value" id="goroutines">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">ロードアベレージ:</span>
+                        <span class="value" id="loadAvg">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">最終更新:</span>
+                        <span class="value" id="lastUpdate">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CPU使用率 -->
+            <div class="card">
+                <h2>CPU使用率</h2>
+                <div class="metric-container">
+                    <div class="circular-progress" id="cpuProgress">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring-background" cx="60" cy="60" r="50"></circle>
+                            <circle class="progress-ring-fill" cx="60" cy="60" r="50" id="cpuCircle"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <span class="progress-value" id="cpuValue">0</span>
+                            <span class="progress-unit">%</span>
+                        </div>
+                    </div>
+                    <div class="metric-chart">
+                        <canvas id="cpuChart" width="300" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- メモリ使用量 -->
+            <div class="card">
+                <h2>メモリ使用量</h2>
+                <div class="metric-container">
+                    <div class="circular-progress" id="memoryProgress">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring-background" cx="60" cy="60" r="50"></circle>
+                            <circle class="progress-ring-fill" cx="60" cy="60" r="50" id="memoryCircle"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <span class="progress-value" id="memoryValue">0</span>
+                            <span class="progress-unit">%</span>
+                        </div>
+                    </div>
+                    <div class="metric-info">
+                        <div class="memory-details">
+                            <div>使用量: <span id="memoryUsed">0</span> MB</div>
+                            <div>総容量: <span id="memoryTotal">0</span> MB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 温度 -->
+            <div class="card">
+                <h2>CPU温度</h2>
+                <div class="metric-container">
+                    <div class="temperature-display">
+                        <div class="temperature-value">
+                            <span id="temperatureValue">0</span>
+                            <span class="temperature-unit">°C</span>
+                        </div>
+                        <div class="temperature-bar">
+                            <div class="temperature-fill" id="temperatureFill"></div>
+                        </div>
+                        <div class="temperature-labels">
+                            <span>0°C</span>
+                            <span>100°C</span>
+                        </div>
+                    </div>
+                    <div class="metric-chart">
+                        <canvas id="temperatureChart" width="300" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ディスク使用量 -->
+            <div class="card">
+                <h2>ディスク使用量</h2>
+                <div class="metric-container">
+                    <div class="circular-progress" id="diskProgress">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring-background" cx="60" cy="60" r="50"></circle>
+                            <circle class="progress-ring-fill" cx="60" cy="60" r="50" id="diskCircle"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <span class="progress-value" id="diskValue">0</span>
+                            <span class="progress-unit">%</span>
+                        </div>
+                    </div>
+                    <div class="metric-info">
+                        <div class="disk-details">
+                            <div>使用量: <span id="diskUsed">0</span> GB</div>
+                            <div>総容量: <span id="diskTotal">0</span> GB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ネットワーク -->
+            <div class="card network-card">
+                <h2>ネットワーク使用量</h2>
+                <div class="network-stats">
+                    <div class="network-item">
+                        <div class="network-label">受信 (RX)</div>
+                        <div class="network-value" id="networkRx">0 MB</div>
+                    </div>
+                    <div class="network-item">
+                        <div class="network-label">送信 (TX)</div>
+                        <div class="network-value" id="networkTx">0 MB</div>
+                    </div>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="networkChart" width="600" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,173 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ master, main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    
+    - name: Install dependencies
+      run: go mod download
+    
+    - name: Run tests
+      run: go test -v ./...
+    
+    - name: Run go vet
+      run: go vet ./...
+    
+    - name: Run go fmt check
+      run: |
+        if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+          echo "Code not formatted. Please run 'go fmt ./...'"
+          gofmt -s -l .
+          exit 1
+        fi
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64, arm]
+        exclude:
+          - goos: windows
+            goarch: arm
+          - goos: windows
+            goarch: arm64
+          - goos: darwin
+            goarch: arm
+        include:
+          - goos: linux
+            goarch: arm
+            goarm: "7"
+          - goos: linux
+            goarch: arm
+            goarm: "6"
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    
+    - name: Install dependencies
+      run: go mod download
+    
+    - name: Build binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        GOARM: ${{ matrix.goarm }}
+      run: |
+        if [ "$GOOS" = "windows" ]; then
+          EXT=".exe"
+        else
+          EXT=""
+        fi
+        
+        if [ -n "$GOARM" ]; then
+          SUFFIX="${GOOS}-${GOARCH}v${GOARM}"
+        else
+          SUFFIX="${GOOS}-${GOARCH}"
+        fi
+        
+        go build -ldflags="-s -w" -o "raspberry-pi-monitor-${SUFFIX}${EXT}" .
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: raspberry-pi-monitor-*
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: your-dockerhub-username/raspberry-pi-monitor
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
+          type=sha
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64,linux/arm/v7
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  release:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: binaries
+        path: ./binaries
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./binaries/*
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

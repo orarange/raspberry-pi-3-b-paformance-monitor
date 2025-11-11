@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  raspberry-pi-monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: raspberry-pi-monitor
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+    restart: unless-stopped
+    networks:
+      - monitoring
+    # Raspberry Piでホストシステムの情報を取得するため、特権モードが必要な場合
+    # privileged: true
+    volumes:
+      # ホストのシステム情報にアクセスするためのボリューム（オプション）
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc:/host/etc:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.raspberry-pi-monitor.rule=Host(`monitor.local`)"
+      - "traefik.http.services.raspberry-pi-monitor.loadbalancer.server.port=8080"
+
+networks:
+  monitoring:
+    driver: bridge

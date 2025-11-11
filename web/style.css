@@ -1,0 +1,373 @@
+/* リセットCSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ヘッダー */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header h1 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 300;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ff6b6b;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.connected {
+    background-color: #51cf66;
+}
+
+.status-indicator.connecting {
+    background-color: #ffd43b;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* ダッシュボード */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* システム情報カード */
+.system-info {
+    grid-column: 1 / -1;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.info-item .label {
+    font-weight: 500;
+    color: #666;
+}
+
+.info-item .value {
+    font-weight: 600;
+    color: #333;
+}
+
+/* メトリクスコンテナ */
+.metric-container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+/* 円形プログレス */
+.circular-progress {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-background {
+    fill: none;
+    stroke: #e9ecef;
+    stroke-width: 8;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: #667eea;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 314;
+    stroke-dashoffset: 314;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-text {
+    position: absolute;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    color: #333;
+}
+
+.progress-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.progress-unit {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-left: 2px;
+}
+
+/* 温度表示 */
+.temperature-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    min-width: 150px;
+}
+
+.temperature-value {
+    display: flex;
+    align-items: baseline;
+    color: #333;
+}
+
+.temperature-value span:first-child {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.temperature-unit {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.temperature-bar {
+    width: 100px;
+    height: 20px;
+    background: linear-gradient(to right, #51cf66, #ffd43b, #ff6b6b);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.temperature-fill {
+    height: 100%;
+    width: 0%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.temperature-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* メトリクス情報 */
+.metric-info {
+    flex: 1;
+}
+
+.memory-details,
+.disk-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+.memory-details div,
+.disk-details div {
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+}
+
+/* ネットワークカード */
+.network-card {
+    grid-column: 1 / -1;
+}
+
+.network-stats {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.network-item {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.network-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.network-value {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* チャート */
+.metric-chart {
+    flex: 1;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.metric-chart canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .metric-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .network-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 20px;
+    }
+    
+    .progress-value {
+        font-size: 1.5rem;
+    }
+    
+    .temperature-value span:first-child {
+        font-size: 2rem;
+    }
+}
+
+/* 色のバリエーション */
+.card:nth-child(2) .progress-ring-fill { stroke: #667eea; }
+.card:nth-child(3) .progress-ring-fill { stroke: #f093fb; }
+.card:nth-child(5) .progress-ring-fill { stroke: #4facfe; }
+
+/* アニメーション */
+.card {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
+.card:nth-child(5) { animation-delay: 0.5s; }
+.card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
